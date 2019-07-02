@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>The Super Chat</title>
+    </head>
+ 
+    <body>
+        <h1>The super chat:</h1>
+		<!-- message box-->
+		<input type="text" name="message" id="message" placeholder="Your message...">
+		<input type="button" value="send" id="send">
+		
+
+
+        <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        <script>
+            var socket = io.connect('http://localhost:8080');
+			//lors de la conexion, on demande le pseudo
+			
+			var person = prompt("Please enter your name", "X");
+			if (person == null || person == "") {
+			  person = "X";
+			} 
+			//on envoie le pseudo au serveur
+			socket.emit('nom', person);
+			
+			
+			//lorsque quelqu'un se connecte, tout le monde est mit au courant
+            socket.on('nom', function(nom) {
+				
+                $(document.body).append('<div style="margin-top:20px;"><b>'+nom+'</b> joined the chat!</div>');
+            })
+			 $('#send').click(function () {
+			
+                socket.emit('message', $('#message').val());
+            })
+			
+			//lorsque quelqu'un envoie un message,il s'affiche, devancé par le nom de l'envoyeur
+            socket.on('message', function(message) {
+                $(document.body).append('<div style="margin-top:20px;"><b>'+message.nom+':</b> '+message.message+'</div>');
+            })
+            
+        </script>
+       
+    </body>
+</html>
